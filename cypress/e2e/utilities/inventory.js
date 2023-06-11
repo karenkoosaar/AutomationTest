@@ -1,50 +1,78 @@
+const dayjs = require('dayjs');
 import inventoryPage from '../objects/inventoryPage.js';
 const inv = new inventoryPage();
 
-//Asserts the landing page via URL, page header and page footer
-Cypress.Commands.add('assertLandingPage', function(data) {
-    cy.url().should('equal', data.url)
-    inv.pageHeader().contains(data.headerText)
-    inv.pageFooter().contains(data.footerText)
+//Asserts the page header
+Cypress.Commands.add('assertHeader', function(data) {
+    inv.pageHeader().within(() => {
+        inv.btnMenu().should('exist');
+        inv.headerLabel().should('exist').length > 1;
+        inv.iconShoppingCart().should('exist');
+    });
 });
+
+//Asserts the page footer
+Cypress.Commands.add('assertFooter', function(data) {
+    inv.pageFooter().within(() => {
+        inv.socialTwitter().should('exist').contains('Twitter');
+        inv.socialFB().should('exist').contains('Facebook');
+        inv.socialLinkedIn().should('exist').contains('LinkedIn');
+        inv.copyrightText().contains(dayjs().format('YYYY'));
+    }); 
+});
+
 
 //Sorts products depending on input from input.data file and asserts the selection via active option
 Cypress.Commands.add('sortOn', function(data) {
-    inv.sortContainer().select(data.value)
-    inv.sortContainerActiveOption().contains(data.name)
+    inv.sortContainer().select(data.value);
+    inv.sortContainerActiveOption().contains(data.name);
 });
 
-//User adds the last item to the cart and asserts that item was added by verifying the cart count
+//Finds the last item in Inventory, saves its name into a variable, puts the item in Cart and returns the wrapped object
 Cypress.Commands.add('addLastItemToCart', function() {
-    inv.cartCount().should('not.exist')
-    inv.btnAddToCart().last().click()
-    inv.cartCount().should('contain', '1')
+        inv.inventoryItem().last().then((inventoryItem) => {
+            var itemName = inventoryItem.find('[class="inventory_item_name"]').text();
+            cy.log(itemName);
+            inventoryItem.find('[class="btn btn_primary btn_small btn_inventory"]').click();
+            return cy.wrap({ Name : itemName }).as("lastItemInInventory");
+        });
+    }); 
+
+
+//Finds the item by position in Inventory, saves its name into a variable, puts the item in Cart and returns the wrapped object
+Cypress.Commands.add('addItemToCartByPosition', function(position) {
+    inv.inventoryItem().eq(position).then((inventoryItem) => {
+        var itemName = inventoryItem.find('[class="inventory_item_name"]').text();
+        cy.log(itemName);
+        inventoryItem.find('[class="btn btn_primary btn_small btn_inventory"]').click();
+        return cy.wrap({ Name : itemName }).as("itemByPositionInInventory");
+    });
 }); 
 
-//User adds the top right item to the cart and asserts that item was added by verifying the cart count
-Cypress.Commands.add('addTopRightItemToCart', function() {
-    inv.cartCount().should('contain', '1')
-    inv.btnAddToCart().eq(1).click()
-    inv.cartCount().should('contain', '2')
+//User navigates to the Cart page and asserts the URL
+Cypress.Commands.add('goToCart', function() {
+    inv.iconShoppingCart().click();
+    cy.url().should('include', 'cart');
 });
 
-//User navigates to the cart page via the cart icon and asserts the landing URL
-Cypress.Commands.add('goToCart', function(data) {
-    inv.iconShoppingCart().click()
-    cy.url().should('equal', data.url)
-});
-
-//User resets the App State
+//User resets the App State, reloads the page and asserts that nothing is in Cart
 Cypress.Commands.add('resetAppState', function() {
-    inv.btnMenu().click()
-    inv.resetAppState().click()
-    cy.reload(true)
-    inv.cartCount().should('not.exist')
+    inv.btnMenu().click();
+    inv.resetAppState().click();
+    cy.reload(true);
+    inv.cartCount().should('not.exist');
 })
 
 //User removes item from cart
 Cypress.Commands.add('removeItemFromCart', function() {
-    inv.cartCount().should('exist')
-    inv.btnRemoveFromCart().click()
-    inv.cartCount().should('not.exist')
+    inv.cartCount().should('exist');
+    inv.btnRemoveFromCart().click();
+    inv.cartCount().should('not.exist');
+});
+
+//User logs out
+Cypress.Commands.add('logOut', function() {
+    inv.btnMenu().click();
+    inv.logOut().click();
+    cy.url().should('equal','https://www.saucedemo.com/')
 });

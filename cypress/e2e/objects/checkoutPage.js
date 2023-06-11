@@ -1,32 +1,40 @@
 class checkoutPage {
 
     inputFirstName() {
-        return cy.get('[data-test="firstName"]')
-    }
+        return cy.get('[data-test="firstName"]');
+    };
 
     inputLastName() {
-        return cy.get('[data-test="lastName"]')
-    }
+        return cy.get('[data-test="lastName"]');
+    };
 
     inputPostCode() {
-        return cy.get('[data-test="postalCode"]')
-    }
+        return cy.get('[data-test="postalCode"]');
+    };
 
     btnContinue() {
-        return cy.get('[data-test="continue"]')
-    }
+        return cy.get('[data-test="continue"]');
+    };
 
     btnFinish() {
-        return cy.get('[data-test="finish"]')
-    }
+        return cy.get('[data-test="finish"]');
+    };
 
-    orderCompleteHeader() {
-        return cy.get('[class="complete-header"]')
-    }
+    checkoutComplete() {
+        return cy.get('[id="checkout_complete_container"]');
+    };
 
-    orderCompleteText() {
-        return cy.get('[class="complete-text"]')
-    }
+    checkoutCompleteImg() {
+        return cy.get('[class="pony_express"]');
+    };
+
+    checkoutCompleteHeader() {
+        return cy.get('[class="complete-header"]');
+    };
+
+    checkoutCompleteText() {
+        return cy.get('[class="complete-text"]');
+    };
 }
 
 export default checkoutPage;
