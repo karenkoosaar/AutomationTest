@@ -74,7 +74,6 @@ Most scenarios for a smoketest are already covered with the login tests and the 
 - Cypress (v 12.14.0)
 - Node.js (v 17.4.0)
 - Node Package Manager/npm (v 6.14.6)
-- Chrome browser
 
 ## Steps to run tests:
 - Verify that Node.js is installed on your machine, if not then install Node.js
